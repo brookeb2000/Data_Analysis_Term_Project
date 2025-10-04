@@ -1,5 +1,10 @@
 # Term Project – [Short Project Title]
 
+## Note to self:
+-work in jupyter lab and go through conda to use the environment I set up for this for juypter lab
+-use VS code to open the same project and do the git stuff there
+-for this project want to learn how to use branches (Create just one feature branch for your “extra work” or “new analysis.”)
+
 ## Overview
 Brief 2-3 sentence summary of the project goal and context.
 The students enrolled in CSDS 413 will conduct a data analysis project throughout the semester.  The project teams will identify a question to be answered, develop a hypothesis, and perform data  analysis to test their hypothesis and answer the question they pose. 
