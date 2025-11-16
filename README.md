@@ -10,7 +10,27 @@ Brief 2-3 sentence summary of the project goal and context.
 This project analyzes whether knowing the abundance of certain gut bacteria reduces the uncertainty about whether or not a person has Chron's disease. To achieve this, we computed the mutual information ... 
 
 ## Data Sources
-This dataset from GMrepo contains multiple molecular profiling layers collected from 200 patients, including metagenomics, 16S sequencing, metaproteomics (TMT-MS3), and metabolomics. In this project, we focus specifically on the shotgun metagenomics-derived microbial relative abundance, as well as patient phenotype (Chron disease, colitis, healthy).
+This project uses data from GMrepo (Project PRJEB42155), a curated multi-omics repository containing metagenomics, 16S rRNA sequencing, metaproteomics (TMT-MS3), and metabolomics profiles from 200 patients. 
+
+For this analysis, we focus exclusively on:
+- **Shotgun metagenomics–derived microbial relative abundance**, and  
+- **Patient phenotype** (Crohn’s disease, colitis, healthy)
+
+We filter the dataset to **Crohn’s disease vs healthy** patients and use the following variables:
+- **phenotype** (Crohn’s disease vs healthy)  
+- **RunID** (unique metagenomics run identifier)  
+- **Relative abundance** for the following 10 IBD-associated taxa:  
+  - *Faecalibacterium* (genus)  
+  - *Faecalibacterium prausnitzii* (species)  
+  - *Roseburia* (genus)  
+  - *Coprococcus* (genus)  
+  - *Bifidobacterium* (genus)  
+  - *Escherichia coli* (species)  
+  - *Mediterraneibacter gnavus* (species)  
+  - *Veillonella* (genus)  
+  - *Bacteroides fragilis* (species)  
+  - *Akkermansia muciniphila* (species)
+
 
 ## Requirements
 - Python 3.10+
