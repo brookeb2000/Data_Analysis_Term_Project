@@ -10,7 +10,7 @@ Brief 2-3 sentence summary of the project goal and context.
 This project analyzes whether knowing the abundance of certain gut bacteria reduces the uncertainty about whether or not a person has Chron's disease. To achieve this, we computed the mutual information ... 
 
 ## Data Sources
-Describe datasets, source links, size, and any preprocessing.
+This dataset from GMrepo contains multiple molecular profiling layers collected from 200 patients, including metagenomics, 16S sequencing, metaproteomics (TMT-MS3), and metabolomics. In this project, we focus specifically on the shotgun metagenomics-derived microbial relative abundance, as well as patient phenotype (Chron disease, colitis, healthy).
 
 ## Requirements
 - Python 3.10+
