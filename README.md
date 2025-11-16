@@ -1,4 +1,4 @@
-# Term Project – [Short Project Title]
+# Term Project – Mutual Information Between Gut Bacterial Abundance and Crohn’s Disease Status
 
 ## Note to self:
 -work in jupyter lab and go through conda to use the environment I set up for this for juypter lab
