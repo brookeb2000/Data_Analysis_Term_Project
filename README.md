@@ -7,7 +7,7 @@
 
 ## Overview
 Brief 2-3 sentence summary of the project goal and context.
-The students enrolled in CSDS 413 will conduct a data analysis project throughout the semester.  The project teams will identify a question to be answered, develop a hypothesis, and perform data  analysis to test their hypothesis and answer the question they pose. 
+This project analyzes whether knowing the abundance of certain gut bacteria reduces the uncertainty about whether or not a person has Chron's disease. To achieve this, we computed the mutual information ... 
 
 ## Data Sources
 Describe datasets, source links, size, and any preprocessing.
