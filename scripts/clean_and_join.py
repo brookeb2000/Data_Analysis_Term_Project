@@ -6,19 +6,14 @@ Purpose:
     to microbial relative abundances and selected clinical metadata.
 
 Inputs (expected in data/raw/):
-    - patient_metadata.csv     : patient-level phenotype and clinical variables
-    - bacteria_table.csv     : microbial relative abundances per patient
+    - patient_metadata.tsv     : patient-level phenotype and clinical variables
+    - bacteria_table.tsv       : microbial relative abundances per patient
 
 Outputs (written to data/cleaned/):
     - joined_microbiome_MI_ready.csv : one row per tube_id with:
         * tube_id
         * Diagnosis (Crohn's vs healthy label)
         * Relative abundance for 9 selected taxa
-        * Final_Metabolomics_Weight (validation variable)
-
-Notes:
-    - This script is intended to be fully reproducible: running it should
-      overwrite any existing cleaned dataset using the current raw inputs.
 """
 
 import pandas as pd
@@ -48,7 +43,9 @@ raw_bacteria_table = pd.read_csv(
 print("raw patient metadata shape:", raw_patient_metadata.shape)
 print("raw bacteria table shape:", raw_bacteria_table.shape)
 
+# ------------------------------------------------------------
 # Restructure bacteria table → one row per tube_id
+# ------------------------------------------------------------
 
 # Rename the first column to something meaningful (taxon names)
 raw_bacteria_table.rename(
@@ -69,28 +66,32 @@ bact_by_sample = (
 print("Restructured bacteria table:", bact_by_sample.shape)
 print(bact_by_sample.head())
 
-#check count of patients by diagnosis group for raw_patient_metadata
+# Check count of patients by diagnosis group for raw_patient_metadata
 print("Patient counts by diagnosis group:")
-print(raw_patient_metadata['Diagnosis'].value_counts())
+print(raw_patient_metadata["Diagnosis"].value_counts())
 
-#look for duplicate tupe_ids in raw_patient_metadata
-duplicate_tube_ids = raw_patient_metadata[raw_patient_metadata.duplicated(subset=['tube_id'], keep=False)]
+# Look for duplicate tube_ids in raw_patient_metadata
+duplicate_tube_ids = raw_patient_metadata[
+    raw_patient_metadata.duplicated(subset=["tube_id"], keep=False)
+]
 if not duplicate_tube_ids.empty:
     print("Duplicate tube_ids found in patient metadata:")
     print(duplicate_tube_ids)
 
-# we found a sample that is the same record copied twice with a typo, so we will drop one
+# We found a sample that is the same record copied twice with a typo, so we will drop one
 raw_patient_metadata = raw_patient_metadata.drop_duplicates(
     subset="tube_id",
     keep="first"
 )
 
-#validate we have no more duplicates
-duplicate_tube_ids = raw_patient_metadata[raw_patient_metadata.duplicated(subset=['tube_id'], keep=False)]
+# Validate we have no more duplicates
+duplicate_tube_ids = raw_patient_metadata[
+    raw_patient_metadata.duplicated(subset=["tube_id"], keep=False)
+]
 if duplicate_tube_ids.empty:
     print("No duplicate tube_ids found in patient metadata after cleanup.")
 
-#rename dataframes for clarity
+# Rename dataframes for clarity
 patient_metadata_cleaned = raw_patient_metadata
 bacteria_table_cleaned = bact_by_sample
 
@@ -101,37 +102,33 @@ print("bacteria_table_cleaned shape:", bacteria_table_cleaned.shape)
 # 3. Standardize column names, types, and labels
 #   - Convert types (e.g., timestamps, numeric abundance)
 #   - Ensure consistent disease categories (e.g. "Crohn's" vs "CD")
-#   - For each sampkle, convert raw bacterial counts to relative abundances
+#   - For each sample, convert raw bacterial counts to relative abundances
 # ============================================================
 
-# fix types for patient_metadata_cleaned for tube_id, Diagnosis and Final_Metabolomics_Weight
-patient_metadata_cleaned['tube_id'] = patient_metadata_cleaned['tube_id'].astype(str)   
-patient_metadata_cleaned['Final_Metabolomics_Weight'] = pd.to_numeric(
-    patient_metadata_cleaned['Final_Metabolomics_Weight'],
-    errors='coerce'
-)
+# Fix types for patient_metadata_cleaned for tube_id
+patient_metadata_cleaned["tube_id"] = patient_metadata_cleaned["tube_id"].astype(str)
 
-# fix data types for bacteria_table_cleaned for tube_id and taxa columns
-bacteria_table_cleaned['tube_id'] = bacteria_table_cleaned['tube_id'].astype(str)
+# Fix data types for bacteria_table_cleaned for tube_id and taxa columns
+bacteria_table_cleaned["tube_id"] = bacteria_table_cleaned["tube_id"].astype(str)
 for col in bacteria_table_cleaned.columns[1:]:
     bacteria_table_cleaned[col] = pd.to_numeric(
         bacteria_table_cleaned[col],
-        errors='coerce'
+        errors="coerce"
     )
 
-# standardize Diagnosis labels
+# Standardize Diagnosis labels
 patient_metadata_cleaned["Diagnosis"] = (
     patient_metadata_cleaned["Diagnosis"]
     .str.strip()
     .replace({"Healthy_control": "Healthy", "CD": "Crohn"})
     .astype("category")
 )
-#verify data types are correct
+
+# Verify data types are correct
 print("Patient metadata data types:")
 print(patient_metadata_cleaned.dtypes)
 print("Bacteria table data types:")
 print(bacteria_table_cleaned.dtypes)
-
 
 # ------------------------------------------------------------
 # Convert raw bacterial counts → relative abundance per sample
@@ -165,8 +162,8 @@ else:
 #   - Inner join on tube_id
 #   - Confirm joined patient counts match expectations
 # ============================================================
-metadata_cols = ["tube_id", "Diagnosis", "Final_Metabolomics_Weight"]
 
+metadata_cols = ["tube_id", "Diagnosis"]
 patient_subset = patient_metadata_cleaned[metadata_cols].copy()
 
 # Perform the join (only matching tube_ids kept)
@@ -175,37 +172,35 @@ joined_df = bacteria_table_cleaned.merge(
     on="tube_id",
     how="inner"
 )
-# Confirm joined shape, (some tube_ids didnt have matching patient records, some patient records didnt have tube_ids)
+
+# Confirm joined shape (some tube_ids didn't have matching patient records, and vice versa)
 print("Joined dataset shape:", joined_df.shape)
 
 print("Diagnosis counts in joined_df:")
 print(joined_df["Diagnosis"].value_counts())
-
-
 
 # ============================================================
 # 5. Explore distributions of microbial abundances
 #   - Histograms to choose meaningful binning strategy
 # ============================================================
 
-#inspect distributions of microbial abundances
-import numpy as np
+# Inspect distributions of microbial abundances
 import matplotlib.pyplot as plt
 
 bacteria_cols = [
     c for c in joined_df.columns
-    if c not in ["tube_id", "Diagnosis", "Final_Metabolomics_Weight"]
+    if c not in ["tube_id", "Diagnosis"]
 ]
 
 for taxon in bacteria_cols:
     vals = joined_df[taxon].dropna().values
-    
+
     # Compute quartiles
     q1 = np.percentile(vals, 25)
     q2 = np.percentile(vals, 50)  # median
     q3 = np.percentile(vals, 75)
 
-    plt.figure(figsize=(8,4))
+    plt.figure(figsize=(8, 4))
 
     bins = np.linspace(0, 1, 30)
     plt.hist(vals, bins=bins, edgecolor="black", alpha=0.7)
@@ -213,10 +208,12 @@ for taxon in bacteria_cols:
     # Overlay quartile cut markers
     for q, label in zip([q1, q2, q3], ["Q1", "Median", "Q3"]):
         plt.axvline(q, color="red", linestyle="--", linewidth=1)
-        plt.text(q, plt.ylim()[1]*0.9, label,
-                 rotation=90, verticalalignment="top",
-                 color="red", fontsize=9, fontweight="bold")
-    
+        plt.text(
+            q, plt.ylim()[1] * 0.9, label,
+            rotation=90, verticalalignment="top",
+            color="red", fontsize=9, fontweight="bold"
+        )
+
     plt.title(f"Distribution of {taxon} with quartiles")
     plt.xlabel("Relative abundance")
     plt.ylabel("Number of samples")
@@ -254,9 +251,9 @@ print("\nBinning summary per taxon:")
 print(bacteria_summary)
 
 # Note:
-# Because zero-inflation was modest across taxa (mostly 2–15%), 
-# presence vs. absence is not the dominant driver of variation in microbial abundance. 
-# Therefore, splitting the non-zero values into low and high (using the median among non-zeros) 
+# Because zero-inflation was modest across taxa (mostly 2–15%),
+# presence vs. absence is not the dominant driver of variation in microbial abundance.
+# Therefore, splitting the non-zero values into low and high (using the median among non-zeros)
 # preserves the biologically relevant abundance differences that are likely to contribute most to the MI signal.
 
 # ============================================================
@@ -266,11 +263,3 @@ print(bacteria_summary)
 
 joined_df.to_csv("data/cleaned/joined_MI_ready.csv", index=False)
 print("\n✓ Cleaned and joined dataset written to data/cleaned/joined_MI_ready.csv")
-
-
-
-
-
-
-
-
