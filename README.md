@@ -26,11 +26,23 @@ Mutual information values were low across all taxa, indicating substantial overl
 - matplotlib >= 3.9
 
 ## Repository Structure
-- /data/ … 
-- /figures/ … 
-- /results/ … 
-- /scripts/ … 
-- README.md … 
+- `data/`
+  - `raw/` – original input data (TSV files)
+  - `cleaned/` – analysis-ready dataset  
+    - `joined_MI_ready.csv`
+- `scripts/`
+  - `clean_and_join.py` – data cleaning, normalization, and joining
+  - `binning_and_MI.py` – binning, MI computation, permutation testing, FDR correction
+- `results/`
+  - `figures/` – plots and visual summaries  
+    - `MI_dotplot.png`  
+    - `boxplot_Faecalibacterium.png`  
+    - `boxplot_Faecalibacterium_prausnitzii.png`  
+    - `boxplot_Escherichia_coli.png`
+  - `tables/` – machine-readable result tables  
+    - `MI_results.csv`
+- `README.md`
+- `LICENSE`
 
 ## License
 MIT
