@@ -9,7 +9,7 @@ Purpose:
 
 Inputs (from data/cleaned/):
     - joined_MI_ready.csv : one row per tube_id with
-      diagnosis label, Final_Metabolomics_Weight and relative abundances for 9 selected taxa.
+      diagnosis label and relative abundances for 9 selected taxa.
 
 Outputs (written to results/):
     - tables/MI_results.csv          : MI (bits), raw p-values,
@@ -56,7 +56,7 @@ binned_df = df.copy()
 # Identify taxon columns: everything except ID / label / metadata
 taxa_cols = [
     c for c in binned_df.columns
-    if c not in ["tube_id", "Diagnosis", "Final_Metabolomics_Weight"]
+    if c not in ["tube_id", "Diagnosis"]
 ]
 
 for taxon in taxa_cols:
@@ -84,7 +84,7 @@ bin_cols = [c for c in binned_df.columns if c.endswith("_bin")]
 binned_df[bin_cols] = binned_df[bin_cols].astype("Int64")
 
 # Keep only metadata + binned columns (drop raw abundance columns)
-keep_cols = ["tube_id", "Diagnosis", "Final_Metabolomics_Weight"] + bin_cols
+keep_cols = ["tube_id", "Diagnosis"] + bin_cols
 binned_df = binned_df[keep_cols]
 
 print("\nColumns retained for MI analysis:")
@@ -321,34 +321,4 @@ for taxon in top3:
     plt.savefig(boxplot_path, dpi=300)
     plt.close()
     print(f"Saved boxplot for {taxon} to: {boxplot_path}")
-
-# ---------- 7c. Side-by-side boxplots for ALL taxa ----------
-
-# Use the same taxa order as in the MI table
-all_taxa = mi_plot_df["taxon"].tolist()
-print("\nAll taxa for boxplots:", all_taxa)
-
-for taxon in all_taxa:
-    crohn_vals = df.loc[df["Diagnosis"] == "Crohn", taxon].dropna()
-    healthy_vals = df.loc[df["Diagnosis"] == "Healthy", taxon].dropna()
-
-    # Skip taxa with too few observations in either group
-    if len(crohn_vals) < 3 or len(healthy_vals) < 3:
-        print(f"Skipping {taxon}: too few observations for boxplot.")
-        continue
-
-    plt.figure(figsize=(5, 5))
-    plt.boxplot(
-        [crohn_vals, healthy_vals],
-        labels=["Crohn", "Healthy"],
-        showfliers=False
-    )
-
-    plt.ylabel("Relative abundance")
-    plt.title(f"{taxon}: abundance by diagnosis")
-
-    plt.tight_layout()
-    boxplot_path = f"results/figures/boxplot_all_{taxon}.png"
-    plt.savefig(boxplot_path, dpi=300)
-    plt.close()
-    print(f"Saved boxplot for {taxon} to: {boxplot_path}")
+    
