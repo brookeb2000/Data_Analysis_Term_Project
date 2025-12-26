@@ -1,7 +1,7 @@
 # Mutual Information Between Gut Bacterial Abundance and Crohn’s Disease Status
 
 ## Overview 
-This project assesses whether knowing the abundance of selected gut bacteria well-documented in IBD research reduces uncertainty in Crohn’s disease status. Using shotgun metagenomics–derived microbial relative abundance of the 9 selected bacteria, I computed mutual information with 10,000 permutations to assess significance, and applied false discovery rate (FDR) control to account for multiple hypothesis testing. 
+This project assesses whether knowing the abundance of selected gut bacteria well-documented in IBD research reduces uncertainty in Crohn’s disease status. Because mutual information captures both linear and nonlinear associations without assuming a specific parametric model, it was chosen to quantify dependence between bacterial abundance and disease status. Using shotgun metagenomics–derived microbial relative abundance of the 9 selected bacteria, I computed mutual information with 10,000 permutations to assess significance, and applied false discovery rate (FDR) control to account for multiple hypothesis testing.
 
 ## Data 
 - Source: GMrepo (Project PRJEB42155)
